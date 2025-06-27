@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Games - Zekli Games</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      font-size: 2.8em;
+      color: #00f0ff;
+      text-shadow: 2px 2px 8px #000;
+    }
+    .nav {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .nav a {
+      text-decoration: none;
+      background-color: #00f0ff;
+      color: #000;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+    .nav a:hover {
+      background-color: #00bcd4;
+    }
+    .search-bar {
+      margin: 20px auto;
+      max-width: 400px;
+      text-align: center;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+    }
+    .category {
+      margin: 40px auto;
+      max-width: 1200px;
+      padding: 0 20px;
+    }
+    .category h2 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #00bcd4;
+      border-left: 5px solid #00f0ff;
+      padding-left: 10px;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+    .game-card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: center;
+      padding: 15px 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    .game-card img {
+      width: 100%;
+      border-radius: 10px;
+      max-height: 140px;
+      object-fit: cover;
+      border: 2px solid #00f0ff;
+    }
+    .game-card a {
+      display: block;
+      margin-top: 10px;
+      color: #00f0ff;
+      font-weight: bold;
+      font-size: 1.05em;
+      text-decoration: none;
+    }
+    .game-card a:hover {
+      color: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Explore All Games on Zekli</h1>
+
+  <div class="nav">
+    <a href="index.html">🏠 Back to Homepage</a>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search games..." onkeyup="filterAllGames()">
+  </div>
+
+  <!-- 🔊 Background Music -->
+  <audio id="bg-music" src="assets/bg-music.mp3" autoplay loop muted></audio>
+  <script>
+    const audio = document.getElementById("bg-music");
+    window.addEventListener('click', () => {
+      audio.muted = false;
+      audio.play().catch(() => {});
+    }, { once: true });
+
+    function filterAllGames() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.game-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+  </script>
+
+  <div class="category">
+    <h2>Multiplayer Games</h2>
+    <div class="games-grid">
+      <div class="game-card">
+        <img src="assets/thumbs/game0.jpg" alt="Talk To VictorX A.I">
+        <a href="games/game0/index.html" target="_blank">Talk To VictorX A.I</a>
+      </div>
+      <div class="game-card">
+        <img src="assets/thumbs/game1.jpg" alt="Play Among Us">
+        <a href="games/game1/index.html" target="_blank">Play Among Us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="category">
+    <h2>Funny Games</h2>
+    <div class="games-grid">
+      <div class="game-card">
+        <img src="assets/thumbs/game2.jpg" alt="We Become What We Behold">
+        <a href="games/game2/index.html" target="_blank">We Become What We Behold</a>
+      </div>
+      <div class="game-card">
+        <img src="assets/thumbs/game3.jpg" alt="Kick The Buddy">
+        <a href="games/game3/index.html" target="_blank">Kick The Buddy Forever</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="category">
+    <h2>Fighting Games</h2>
+    <div class="games-grid">
+      <div class="game-card">
+        <img src="assets/thumbs/game4.jpg" alt="Ninja Fight 3D">
+        <a href="games/game4/index.html" target="_blank">Ninja Fight 3D</a>
+      </div>
+      <div class="game-card">
+        <img src="assets/thumbs/game6.jpg" alt="Zombie Outbreak Arena">
+        <a href="games/game6/index.html" target="_blank">Zombie Outbreak Arena</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="category">
+    <h2>Racing Games</h2>
+    <div class="games-grid">
+      <div class="game-card">
+        <img src="assets/thumbs/game7.jpg" alt="NFS Burnout Drift Cars">
+        <a href="games/game7/index.html" target="_blank">NFS Burnout Drift Cars</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="category">
+    <h2>Arcade Games</h2>
+    <div class="games-grid">
+      <div class="game-card">
+        <img src="assets/thumbs/game5.jpg" alt="Snake.io">
+        <a href="games/game5/index.html" target="_blank">Snake.io</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
