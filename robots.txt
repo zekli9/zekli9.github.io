@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zekli9.github.io/assets/sitemap.xml
