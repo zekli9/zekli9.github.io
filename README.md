@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Under Maintenance</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    body {
+      margin: 0;
+      background: #0f2027;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3em;
+      color: #00f0ff;
+    }
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+    }
+    .spinner {
+      margin-top: 30px;
+      width: 40px;
+      height: 40px;
+      border: 5px solid #00f0ff;
+      border-top: 5px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <!-- ✅ AdSense Script (only once per page, usually in <head>) -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9289352707389729"
+     crossorigin="anonymous"></script>
+
+</head>
+<body>
+  <h1>🚧 Maintenance in Progress</h1>
+  <p>We’re working hard to improve your experience.<br>Please check back in a few minutes.</p>
+  <div class="spinner"></div>
+
+<!-- ✅ Ad Display Block -->
+<div style="width:100%;max-width:970px;margin:40px auto;">
+  <ins class="adsbygoogle"
+       style="display:block; text-align:center; min-height:100px;"
+       data-ad-client="ca-pub-9289352707389729"
+       data-ad-slot="9144775503"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+</div>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+</body>
+</html>
