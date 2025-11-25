@@ -46,7 +46,7 @@
 </head>
 <body>
   <h1>🚧 Maintenance in Progress</h1>
-  <p>We’re working hard to improve your experience.<br>Please check back in a few minutes.</p>
+  <p>We’re working hard to improve your experience.<br>Please check back in a few minutes. Contact Support :- (+91)98550 32677</p>
   <div class="spinner"></div>
 
 <!-- ✅ Ad Display Block -->
