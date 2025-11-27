@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products – Zekli Store</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-mascot">
+            <img src="img/mini-mascot.png" alt="">
+        </div>
+        <div class="loader-text">Loading Products... ✨</div>
+    </div>
+
+    <!-- Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">ZEKLI<span>STORE</span></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="custom-orders.html">Custom</a>
+            <a href="contact.html">Contact</a>
+            <a href="about.html">About</a>
+            <a href="cart.html">Cart</a>
+            <a href="checkout.html">Checkout</a>
+        </nav>
+    </header>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <h1>🛒 Our Products</h1>
+        <p>Browse anime figures, keychains, accessories & more.</p>
+    </section>
+
+    <!-- Search -->
+    <div class='search-bar'>
+        <input id='searchInput' placeholder='Search products...'>
+        <span>🔍</span>
+    </div>
+
+    <!-- Filters -->
+    <div class='filters-bar'>
+        <button class='filter-btn active' data-filter='all'>All</button>
+        <button class='filter-btn' data-filter='stickers'>Stickers</button>
+        <button class='filter-btn' data-filter='figures'>Figures</button>
+        <button class='filter-btn' data-filter='keychains'>Keychains</button>
+        <button class='filter-btn' data-filter='bracelets'>Bracelets</button>
+        <button class='filter-btn' data-filter='watches'>Watches</button>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <section class='section'>
+        <div class='card-grid'>
+
+            <!-- 001 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Tanjiro)'>
+                <div class='card-img' style="background-image:url('img/product001.png');"></div>
+                <div class='product-id'>ID: 001</div>
+                <h3>Sticker (Tanjiro)</h3>
+                <p>₹49</p>
+                <button class='btn-small btn-add-cart' data-id='001' data-name='Sticker (Tanjiro)' data-price='49' data-img='img/product001.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 002 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (K-Drama)'>
+                <div class='card-img' style="background-image:url('img/product002.png');"></div>
+                <div class='product-id'>ID: 002</div>
+                <h3>Sticker (K-Drama)</h3>
+                <p>₹49</p>
+                <button class='btn-small btn-add-cart' data-id='002' data-name='Sticker (K-Drama)' data-price='49' data-img='img/product002.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 003 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Yorichi × Kokushibo)'>
+                <div class='card-img' style="background-image:url('img/product003.png');"></div>
+                <div class='product-id'>ID: 003</div>
+                <h3>Sticker (Yorichi × Kokushibo)</h3>
+                <p>₹49</p>
+                <button class='btn-small btn-add-cart' data-id='003' data-name='Sticker (Yorichi × Kokushibo)' data-price='49' data-img='img/product003.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 004 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Tanjiro, Zenitsu, Inosuke, Nezuko)'>
+                <div class='card-img' style="background-image:url('img/product004.png');"></div>
+                <div class='product-id'>ID: 004</div>
+                <h3>Sticker (Tanjiro, Zenitsu, Inosuke, Nezuko)</h3>
+                <p>₹49</p>
+                <button class='btn-small btn-add-cart' data-id='004' data-name='Sticker (Tanjiro, Zenitsu, Inosuke, Nezuko)' data-price='49' data-img='img/product004.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 005 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Tanjiro & Nezuko)'>
+                <div class='card-img' style="background-image:url('img/product005.png');"></div>
+                <div class='product-id'>ID: 005</div>
+                <h3>Sticker (Tanjiro & Nezuko)</h3>
+                <p>₹59</p>
+                <button class='btn-small btn-add-cart' data-id='005' data-name='Sticker (Tanjiro & Nezuko)' data-price='59' data-img='img/product005.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 006 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Zenitsu 1st Form)'>
+                <div class='card-img' style="background-image:url('img/product006.png');"></div>
+                <div class='product-id'>ID: 006</div>
+                <h3>Sticker (Zenitsu 1st Form)</h3>
+                <p>₹79</p>
+                <button class='btn-small btn-add-cart' data-id='006' data-name='Sticker (Zenitsu 1st Form)' data-price='79' data-img='img/product006.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 007 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (JJK Inumaki)'>
+                <div class='card-img' style="background-image:url('img/product007.png');"></div>
+                <div class='product-id'>ID: 007</div>
+                <h3>Sticker (JJK Inumaki)</h3>
+                <p>₹59</p>
+                <button class='btn-small btn-add-cart' data-id='007' data-name='Sticker (JJK Inumaki)' data-price='59' data-img='img/product007.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 008 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Sukuna)'>
+                <div class='card-img' style="background-image:url('img/product008.png');"></div>
+                <div class='product-id'>ID: 008</div>
+                <h3>Sticker (Sukuna)</h3>
+                <p>₹69</p>
+                <button class='btn-small btn-add-cart' data-id='008' data-name='Sticker (Sukuna)' data-price='69' data-img='img/product008.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 009 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (JJK Nanami)'>
+                <div class='card-img' style="background-image:url('img/product009.png');"></div>
+                <div class='product-id'>ID: 009</div>
+                <h3>Sticker (JJK Nanami)</h3>
+                <p>₹69</p>
+                <button class='btn-small btn-add-cart' data-id='009' data-name='Sticker (JJK Nanami)' data-price='69' data-img='img/product009.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 010 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker (Gojo)'>
+                <div class='card-img' style="background-image:url('img/product010.png');"></div>
+                <div class='product-id'>ID: 010</div>
+                <h3>Sticker (Gojo)</h3>
+                <p>₹69</p>
+                <button class='btn-small btn-add-cart' data-id='010' data-name='Sticker (Gojo)' data-price='69' data-img='img/product010.png'>
+                    Add to Cart
+                </button>
+            </div>
+            <!-- 011 -->
+            <div class='card product-card' data-category='figures' data-name='Iron Man Mark 40'>
+                <div class='card-img' style="background-image:url('img/product011.png');"></div>
+                <div class='product-id'>ID: 011</div>
+                <h3>Iron Man Mark 40</h3>
+                <p>₹4999</p>
+                <button class='btn-small btn-add-cart' data-id='011' data-name='Iron Man Mark 40' data-price='4999' data-img='img/product011.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 012 -->
+            <div class='card product-card' data-category='figures' data-name='Iron Man Mark 3'>
+                <div class='card-img' style="background-image:url('img/product012.png');"></div>
+                <div class='product-id'>ID: 012</div>
+                <h3>Iron Man Mark 3</h3>
+                <p>₹5999</p>
+                <button class='btn-small btn-add-cart' data-id='012' data-name='Iron Man Mark 3' data-price='5999' data-img='img/product012.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 013 -->
+            <div class='card product-card' data-category='figures' data-name='JJK Figure Set (12 pcs)'>
+                <div class='card-img' style="background-image:url('img/product013.png');"></div>
+                <div class='product-id'>ID: 013</div>
+                <h3>JJK Figure Set (12 pcs)</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='013' data-name='JJK Figure Set (12 pcs)' data-price='1499' data-img='img/product013.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 014 -->
+            <div class='card product-card' data-category='figures' data-name='Yuji Itadori'>
+                <div class='card-img' style="background-image:url('img/product014.png');"></div>
+                <div class='product-id'>ID: 014</div>
+                <h3>Yuji Itadori</h3>
+                <p>₹1999</p>
+                <button class='btn-small btn-add-cart' data-id='014' data-name='Yuji Itadori' data-price='1999' data-img='img/product014.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 015 -->
+            <div class='card product-card' data-category='figures' data-name='JJK Mini Figures'>
+                <div class='card-img' style="background-image:url('img/product015.png');"></div>
+                <div class='product-id'>ID: 015</div>
+                <h3>JJK Mini Figures</h3>
+                <p>₹599</p>
+                <button class='btn-small btn-add-cart' data-id='015' data-name='JJK Mini Figures' data-price='599' data-img='img/product015.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 016 -->
+            <div class='card product-card' data-category='watches' data-name='Gyro Watch (BMW M8 Edition)'>
+                <div class='card-img' style="background-image:url('img/product016.png');"></div>
+                <div class='product-id'>ID: 016</div>
+                <h3>Gyro Watch (BMW M8 Edition)</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='016' data-name='Gyro Watch (BMW M8 Edition)' data-price='1499' data-img='img/product016.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 017 -->
+            <div class='card product-card' data-category='figures' data-name='Madara (10 Tails)'>
+                <div class='card-img' style="background-image:url('img/product017.png');"></div>
+                <div class='product-id'>ID: 017</div>
+                <h3>Madara (10 Tails)</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='017' data-name='Madara (10 Tails)' data-price='999' data-img='img/product017.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 018 -->
+            <div class='card product-card' data-category='figures' data-name='Zoro (Wano Arc)'>
+                <div class='card-img' style="background-image:url('img/product018.png');"></div>
+                <div class='product-id'>ID: 018</div>
+                <h3>Zoro (Wano Arc)</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='018' data-name='Zoro (Wano Arc)' data-price='999' data-img='img/product018.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 019 -->
+            <div class='card product-card' data-category='figures' data-name='Iron Spider'>
+                <div class='card-img' style="background-image:url('img/product019.png');"></div>
+                <div class='product-id'>ID: 019</div>
+                <h3>Iron Spider</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='019' data-name='Iron Spider' data-price='1499' data-img='img/product019.png'>
+                    Add to Cart
+                </button>
+            </div>
+
+            <!-- 020 -->
+            <div class='card product-card' data-category='figures' data-name='Itachi Uchiha'>
+                <div class='card-img' style="background-image:url('img/product020.png');"></div>
+                <div class='product-id'>ID: 020</div>
+                <h3>Itachi Uchiha</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='020' data-name='Itachi Uchiha' data-price='999' data-img='img/product020.png'>
+                    Add to Cart
+                </button>
+            </div>
+            <!-- 021 -->
+            <div class='card product-card' data-category='figures' data-name='Luffy (Gear 5)'>
+                <div class='card-img' style="background-image:url('img/product021.png');"></div>
+                <div class='product-id'>ID: 021</div>
+                <h3>Luffy (Gear 5)</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='021' data-name='Luffy (Gear 5)' data-price='1499' data-img='img/product021.png'>Add to Cart</button>
+            </div>
+
+            <!-- 022 -->
+            <div class='card product-card' data-category='figures' data-name='Itachi (Susano)'>
+                <div class='card-img' style="background-image:url('img/product022.png');"></div>
+                <div class='product-id'>ID: 022</div>
+                <h3>Itachi (Susano)</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='022' data-name='Itachi (Susano)' data-price='1499' data-img='img/product022.png'>Add to Cart</button>
+            </div>
+
+            <!-- 023 -->
+            <div class='card product-card' data-category='figures' data-name='Luffy (Gear 4)'>
+                <div class='card-img' style="background-image:url('img/product023.png');"></div>
+                <div class='product-id'>ID: 023</div>
+                <h3>Luffy (Gear 4)</h3>
+                <p>₹1299</p>
+                <button class='btn-small btn-add-cart' data-id='023' data-name='Luffy (Gear 4)' data-price='1299' data-img='img/product023.png'>Add to Cart</button>
+            </div>
+
+            <!-- 024 -->
+            <div class='card product-card' data-category='figures' data-name='Luffy (Gear 5 Lightning)'>
+                <div class='card-img' style="background-image:url('img/product024.png');"></div>
+                <div class='product-id'>ID: 024</div>
+                <h3>Luffy (Gear 5 Lightning)</h3>
+                <p>₹1499</p>
+                <button class='btn-small btn-add-cart' data-id='024' data-name='Luffy (Gear 5 Lightning)' data-price='1499' data-img='img/product024.png'>Add to Cart</button>
+            </div>
+
+            <!-- 025 -->
+            <div class='card product-card' data-category='figures' data-name='JJK Itadori'>
+                <div class='card-img' style="background-image:url('img/product025.png');"></div>
+                <div class='product-id'>ID: 025</div>
+                <h3>JJK Itadori</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='025' data-name='JJK Itadori' data-price='999' data-img='img/product025.png'>Add to Cart</button>
+            </div>
+
+            <!-- 026 -->
+            <div class='card product-card' data-category='figures' data-name='Kakashi (Hokage)'>
+                <div class='card-img' style="background-image:url('img/product026.png');"></div>
+                <div class='product-id'>ID: 026</div>
+                <h3>Kakashi (Hokage)</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='026' data-name='Kakashi (Hokage)' data-price='999' data-img='img/product026.png'>Add to Cart</button>
+            </div>
+
+            <!-- 027 -->
+            <div class='card product-card' data-category='figures' data-name='Gojo (Deep Purple)'>
+                <div class='card-img' style="background-image:url('img/product027.png');"></div>
+                <div class='product-id'>ID: 027</div>
+                <h3>Gojo (Deep Purple)</h3>
+                <p>₹999</p>
+                <button class='btn-small btn-add-cart' data-id='027' data-name='Gojo (Deep Purple)' data-price='999' data-img='img/product027.png'>Add to Cart</button>
+            </div>
+
+            <!-- 028 -->
+            <div class='card product-card' data-category='keychains' data-name='Mini Katana Keychain'>
+                <div class='card-img' style="background-image:url('img/product028.png');"></div>
+                <div class='product-id'>ID: 028</div>
+                <h3>Mini Katana Keychain</h3>
+                <p>₹149</p>
+                <button class='btn-small btn-add-cart' data-id='028' data-name='Mini Katana Keychain' data-price='149' data-img='img/product028.png'>Add to Cart</button>
+            </div>
+
+            <!-- 029 -->
+            <div class='card product-card' data-category='bracelets' data-name='Silver Chain Bracelet (Magnetic)'>
+                <div class='card-img' style="background-image:url('img/product029.png');"></div>
+                <div class='product-id'>ID: 029</div>
+                <h3>Silver Chain Bracelet (Magnetic)</h3>
+                <p>₹99</p>
+                <button class='btn-small btn-add-cart' data-id='029' data-name='Silver Chain Bracelet (Magnetic)' data-price='99' data-img='img/product029.png'>Add to Cart</button>
+            </div>
+
+            <!-- 030 -->
+            <div class='card product-card' data-category='bracelets' data-name='Glass Beads Bracelet (Magnetic)'>
+                <div class='card-img' style="background-image:url('img/product030.png');"></div>
+                <div class='product-id'>ID: 030</div>
+                <h3>Glass Beads Bracelet (Magnetic)</h3>
+                <p>₹159</p>
+                <button class='btn-small btn-add-cart' data-id='030' data-name='Glass Beads Bracelet (Magnetic)' data-price='159' data-img='img/product030.png'>Add to Cart</button>
+            </div>
+
+            <!-- 031 -->
+            <div class='card product-card' data-category='keychains' data-name='Anime Keychains (DBZ/Naruto/TR)'>
+                <div class='card-img' style="background-image:url('img/product031.png');"></div>
+                <div class='product-id'>ID: 031</div>
+                <h3>Anime Keychains (DBZ/Naruto/TR)</h3>
+                <p>₹129</p>
+                <button class='btn-small btn-add-cart' data-id='031' data-name='Anime Keychains (DBZ/Naruto/TR)' data-price='129' data-img='img/product031.png'>Add to Cart</button>
+            </div>
+
+            <!-- 032 -->
+            <div class='card product-card' data-category='keychains' data-name='Mini Katana Keychain (Demon Slayer)'>
+                <div class='card-img' style="background-image:url('img/product032.png');"></div>
+                <div class='product-id'>ID: 032</div>
+                <h3>Mini Katana Keychain (Demon Slayer)</h3>
+                <p>₹169</p>
+                <button class='btn-small btn-add-cart' data-id='032' data-name='Mini Katana Keychain (Demon Slayer)' data-price='169' data-img='img/product032.png'>Add to Cart</button>
+            </div>
+
+            <!-- 033 -->
+            <div class='card product-card' data-category='stickers' data-name='Sticker Pack (Demon Slayer – 50pcs)'>
+                <div class='card-img' style="background-image:url('img/product033.png');"></div>
+                <div class='product-id'>ID: 033</div>
+                <h3>Sticker Pack (Demon Slayer – 50pcs)</h3>
+                <p>₹20</p>
+                <button class='btn-small btn-add-cart' data-id='033' data-name='Sticker Pack (Demon Slayer – 50pcs)' data-price='20' data-img='img/product033.png'>Add to Cart</button>
+            </div> 
+        
+           <!-- 034 -->
+            <div class='card product-card' data-category='bracelets' data-name='Black Jade bracelet (18K Gold dust coating)'>
+                <div class='card-img' style="background-image:url('img/product034.png');"></div>
+                <div class='product-id'>ID: 034</div>
+                <h3>Black Jade bracelet (18K Gold dust coating)</h3>
+                <p>₹6999</p>
+                <button class='btn-small btn-add-cart' data-id='034' data-name='Black Jade bracelet (18K Gold dust coating)' data-price='6999' data-img='img/product034.png'>Add to Cart</button>
+            </div>
+        </div> <!-- end card-grid -->
+    </section>
+   
+     <br>
+
+      <a href="custom-orders.html" class="btn-primary">Custom Orders</a>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Zekli Store • All rights reserved.</p>
+    </footer>
+
+    <!-- Mini Mascot Assistant -->
+    <div class="assistant">
+        <img src="img/mini-mascot.png" class="assistant-img">
+        <div class="assistant-bubble">Looking for something special? 🔍</div>
+    </div>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+
+</body>
+</html>
