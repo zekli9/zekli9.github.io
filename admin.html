@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Holographic Hand Interface</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #001219 0%, #000 100%); touch-action: none; font-family: 'Courier New', monospace; }
+        #ui { position: absolute; top: 15px; left: 15px; z-index: 100; pointer-events: none; color: #0ff; text-shadow: 0 0 10px #0ff; font-size: 12px; text-transform: uppercase; }
+        #start-btn { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 255, 255, 0.1); border: 2px solid #0ff; color: #0ff; 
+            padding: 20px 40px; border-radius: 5px; cursor: pointer; pointer-events: auto;
+            backdrop-filter: blur(5px); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0px #0ff; } 50% { box-shadow: 0 0 20px #0ff; } 100% { box-shadow: 0 0 0px #0ff; } }
+        video { position: absolute; bottom: 10px; right: 10px; width: 80px; height: auto; border-radius: 5px; opacity: 0.3; transform: scaleX(-1); border: 1px solid #0ff; }
+        .hud-text { margin-bottom: 5px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+    <div id="ui">
+        <div class="hud-text">STARK_IND_OS_v4.2</div>
+        <div class="hud-text" id="status">INITIATING_SYSTEM...</div>
+        <div class="hud-text" id="coords">X: 0.00 Y: 0.00</div>
+    </div>
+    <button id="start-btn">ENGAGE HOLOGRAPH</button>
+    <video id="webcam" autoplay playsinline></video>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Holographic Scene Constants ---
+        const PARTICLE_COUNT = 4000;
+        const GRID_SIZE = 15;
+        const HOLO_COLOR = 0x00ffff;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio > 1.5 ? 1.5 : 1);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- Iron Man Tech Grid ---
+        const grid = new THREE.GridHelper(GRID_SIZE, 20, 0x004444, 0x002222);
+        grid.rotation.x = Math.PI / 2;
+        grid.position.z = -2;
+        scene.add(grid);
+
+        // --- Particle Setup with Glow ---
+        const createParticleTexture = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.2, 'rgba(0,255,255,0.8)');
+            gradient.addColorStop(0.5, 'rgba(0,100,255,0.2)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        };
+
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLE_COUNT * 3);
+        const targets = new Float32Array(PARTICLE_COUNT * 3);
+        const velocities = new Float32Array(PARTICLE_COUNT * 3);
+
+        for(let i=0; i<PARTICLE_COUNT*3; i++) positions[i] = (Math.random()-0.5)*10;
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.08,
+            map: createParticleTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        camera.position.z = 5;
+
+        // --- Hand Tracking & HUD ---
+        let handX = 0, handY = 0, isHandActive = false;
+        const statusEl = document.getElementById('status');
+        const coordsEl = document.getElementById('coords');
+        const videoElement = document.getElementById('webcam');
+        const startBtn = document.getElementById('start-btn');
+
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.6 });
+
+        hands.onResults((res) => {
+            if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+                isHandActive = true;
+                const tip = res.multiHandLandmarks[0][8];
+                handX = (tip.x - 0.5) * -10; 
+                handY = (tip.y - 0.5) * -8;
+                statusEl.innerText = "HOLOGRAPH_LOCKED_ON";
+                coordsEl.innerText = `X: ${handX.toFixed(2)} Y: ${handY.toFixed(2)}`;
+            } else {
+                isHandActive = false;
+                statusEl.innerText = "SCANNING_FOR_TARGET...";
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            startBtn.style.display = 'none';
+            new Camera(videoElement, {
+                onFrame: async () => { await hands.send({image: videoElement}); },
+                width: 480, height: 360
+            }).start();
+        });
+
+        // --- Animation & Physics ---
+        function animate(time) {
+            requestAnimationFrame(animate);
+            const pos = geometry.attributes.position.array;
+            
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const ix = i*3, iy = i*3+1, iz = i*3+2;
+                
+                // Motion math: Particles drift in a techy "vibration"
+                let tx = Math.sin(time * 0.001 + i) * 2;
+                let ty = Math.cos(time * 0.0012 + i) * 2;
+                
+                if(isHandActive) {
+                    tx = handX + (Math.random() - 0.5) * 1.5;
+                    ty = handY + (Math.random() - 0.5) * 1.5;
+                }
+
+                pos[ix] += (tx - pos[ix]) * 0.04;
+                pos[iy] += (ty - pos[iy]) * 0.04;
+                pos[iz] += (Math.sin(time * 0.002 + i) * 0.01); // Subtle Z-wobble
+            }
+            
+            grid.position.y = Math.sin(time * 0.0005) * 0.2; // Moving grid floor
+            geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+        animate(0);
+
+        // Resize Logic
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Interaction: Tap to explode
+        window.addEventListener('touchstart', () => {
+            material.size = 0.3; // Flash size
+            setTimeout(() => material.size = 0.08, 100);
+        });
+    </script>
+</body>
+</html>
