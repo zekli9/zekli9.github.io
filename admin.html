@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>J.A.R.V.I.S. Particle Interface</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; color: #0ff; font-family: 'Share Tech Mono', monospace; }
+        #ui-layer { position: absolute; inset: 0; pointer-events: none; border: 1px solid rgba(0, 255, 255, 0.1); }
+        .hud-corner { position: absolute; padding: 20px; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; }
+        .top-left { top: 0; left: 0; border-left: 2px solid #0ff; border-top: 2px solid #0ff; width: 100px; height: 100px; }
+        #start-prompt { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px 40px; border: 1px solid #0ff; background: rgba(0, 255, 255, 0.1);
+            cursor: pointer; pointer-events: auto; backdrop-filter: blur(10px);
+        }
+        video { position: absolute; bottom: 20px; left: 20px; width: 120px; border: 1px solid #0ff; opacity: 0.4; transform: scaleX(-1); }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+    <div id="ui-layer">
+        <div class="hud-corner top-left">MARK_85<br>SYSTEM: ACTIVE</div>
+        <div id="start-prompt">INITIALIZE INTERFACE</div>
+    </div>
+    <video id="webcam" autoplay playsinline></video>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Core Variables ---
+        const PARTICLE_COUNT = 6000;
+        let handX = 0, handY = 0, isHandActive = false;
+
+        // --- Three.js Engine ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- The Hologram Material (Custom Shaders) ---
+        const holoVertex = `
+            varying float vGlow;
+            uniform float uTime;
+            uniform vec3 uHandPos;
+            void main() {
+                vec3 pos = position;
+                // Add a digital glitch/jitter
+                float dist = distance(pos, uHandPos);
+                if(dist < 2.0) {
+                    pos += sin(uTime * 10.0 + pos.y) * 0.1;
+                }
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = 4.0 * (1.0 / -mvPosition.z);
+                gl_Position = projectionMatrix * mvPosition;
+                vGlow = 1.0 - (dist / 5.0);
+            }
+        `;
+
+        const holoFragment = `
+            varying float vGlow;
+            uniform float uTime;
+            void main() {
+                // Circular particle shape
+                float r = distance(gl_PointCoord, vec2(0.5));
+                if(r > 0.5) discard;
+                
+                // Pulsing Scanline Effect
+                float scanline = sin(gl_FragCoord.y * 0.1 + uTime * 5.0) * 0.1 + 0.9;
+                vec3 color = vec3(0.0, 0.8, 1.0) * scanline;
+                gl_FragColor = vec4(color, (0.5 - r) * 2.0 * vGlow);
+            }
+        `;
+
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLE_COUNT * 3);
+        for(let i=0; i<PARTICLE_COUNT*3; i++) positions[i] = (Math.random()-0.5)*10;
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader: holoVertex,
+            fragmentShader: holoFragment,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            uniforms: {
+                uTime: { value: 0 },
+                uHandPos: { value: new THREE.Vector3() }
+            }
+        });
+
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        camera.position.z = 5;
+
+        // --- Hand Tracking ---
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0 });
+        hands.onResults(res => {
+            if (res.multiHandLandmarks?.length) {
+                isHandActive = true;
+                const tip = res.multiHandLandmarks[0][8];
+                handX = (tip.x - 0.5) * -12;
+                handY = (tip.y - 0.5) * -8;
+                material.uniforms.uHandPos.value.set(handX, handY, 0);
+            } else { isHandActive = false; }
+        });
+
+        document.getElementById('start-prompt').onclick = (e) => {
+            e.target.style.display = 'none';
+            new Camera(document.getElementById('webcam'), {
+                onFrame: async () => await hands.send({image: document.getElementById('webcam')}),
+                width: 480, height: 360
+            }).start();
+        };
+
+        // --- Render Loop ---
+        function animate(t) {
+            requestAnimationFrame(animate);
+            material.uniforms.uTime.value = t * 0.001;
+            
+            const pos = geometry.attributes.position.array;
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const ix = i*3, iy = i*3+1;
+                if(isHandActive) {
+                    pos[ix] += (handX - pos[ix]) * 0.02 * Math.random();
+                    pos[iy] += (handY - pos[iy]) * 0.02 * Math.random();
+                }
+            }
+            geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+        animate(0);
+    </script>
+</body>
+</html>
