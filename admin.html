@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STARK_OMNI_CUBE_v7</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #001 0%, #000 100%); color: #0ff; font-family: 'Share Tech Mono', monospace; }
+        #ui { position: absolute; inset: 0; pointer-events: none; padding: 20px; }
+        .hud-vitals { position: absolute; top: 20px; left: 20px; border-left: 2px solid #0ff; padding-left: 10px; font-size: 10px; line-height: 1.6; }
+        #start-btn { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px 50px; border: 1px solid #0ff; background: rgba(0, 255, 255, 0.05); color: #0ff;
+            cursor: pointer; pointer-events: auto; letter-spacing: 5px; backdrop-filter: blur(10px); transition: 0.3s;
+        }
+        #start-btn:hover { background: rgba(0, 255, 255, 0.2); }
+        video { position: absolute; bottom: 20px; right: 20px; width: 100px; border-radius: 50%; opacity: 0.3; transform: scaleX(-1); border: 1px solid #0ff; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+    <div id="ui">
+        <div class="hud-vitals">
+            CORE_TEMP: OPTIMAL<br>
+            MATRIX_ID: 0x77AF2<br>
+            SIGNAL_STRENGTH: |||||||||| 98%<br>
+            NEURAL_LINK: ACTIVE
+        </div>
+        <button id="start-btn">INITIALIZE CORE</button>
+    </div>
+    <video id="webcam" autoplay playsinline></video>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        let handX = 0, handY = 0, isHandActive = false;
+        const clock = new THREE.Clock();
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- 1. The Holographic Grid Floor ---
+        const grid = new THREE.GridHelper(20, 40, 0x004444, 0x001111);
+        grid.position.y = -4;
+        scene.add(grid);
+
+        // --- 2. The Complex Omni-Cube ---
+        const masterGroup = new THREE.Group();
+        
+        // Outer Cube (Glassy Wireframe)
+        const outerGeom = new THREE.BoxGeometry(2, 2, 2, 2, 2, 2);
+        const outerWire = new THREE.Mesh(outerGeom, new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.2 
+        }));
+        masterGroup.add(outerWire);
+
+        // Inner Core (Rotating at different speed)
+        const coreGeom = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+        const coreMat = new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending 
+        });
+        const innerCore = new THREE.Mesh(coreGeom, coreMat);
+        masterGroup.add(innerCore);
+
+        // Floating Data Vertices
+        const pointsGeom = new THREE.BufferGeometry().setFromPoints(
+            new THREE.IcosahedronGeometry(2.5, 1).attributes.position.array
+        );
+        const points = new THREE.Points(outerGeom, new THREE.PointsMaterial({
+            size: 0.05, color: 0x00ffff, blending: THREE.AdditiveBlending
+        }));
+        masterGroup.add(points);
+
+        scene.add(masterGroup);
+        camera.position.z = 6;
+
+        // --- 3. Digital "Leash" (Line from Hand to Cube) ---
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.4 });
+        const lineGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+        const leash = new THREE.Line(lineGeom, lineMat);
+        scene.add(leash);
+
+        // --- Hand Tracking ---
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0 });
+        hands.onResults(res => {
+            if (res.multiHandLandmarks?.length) {
+                isHandActive = true;
+                const tip = res.multiHandLandmarks[0][8];
+                handX = (tip.x - 0.5) * -12;
+                handY = (tip.y - 0.5) * -10;
+            } else { isHandActive = false; }
+        });
+
+        document.getElementById('start-btn').onclick = (e) => {
+            e.target.style.display = 'none';
+            new Camera(document.getElementById('webcam'), {
+                onFrame: async () => await hands.send({image: document.getElementById('webcam')}),
+                width: 480, height: 360
+            }).start();
+        };
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            const targetX = isHandActive ? handX : 0;
+            const targetY = isHandActive ? handY : 0;
+
+            // Smooth Motion
+            masterGroup.position.x += (targetX - masterGroup.position.x) * 0.1;
+            masterGroup.position.y += (targetY - masterGroup.position.y) * 0.1;
+
+            // Independent Rotations
+            outerWire.rotation.y = t * 0.5;
+            outerWire.rotation.z = t * 0.2;
+            innerCore.rotation.y = -t * 1.5;
+            innerCore.rotation.x = t * 1.0;
+
+            // Handle Leash
+            if(isHandActive) {
+                leash.visible = true;
+                const points = leash.geometry.attributes.position.array;
+                points[0] = masterGroup.position.x;
+                points[1] = masterGroup.position.y;
+                points[2] = masterGroup.position.z;
+                points[3] = handX;
+                points[4] = handY;
+                points[5] = 0;
+                leash.geometry.attributes.position.needsUpdate = true;
+                lineMat.opacity = 0.2 + Math.sin(t * 10) * 0.2; // Pulsing leash
+            } else {
+                leash.visible = false;
+            }
+
+            // Digital Glitch (Flicker)
+            if(Math.random() > 0.98) {
+                outerWire.visible = false;
+                setTimeout(() => outerWire.visible = true, 50);
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
