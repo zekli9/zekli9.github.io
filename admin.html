@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stark Lab: 3D Constructor</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; color: #0ff; font-family: 'Share Tech Mono', monospace; }
+        #ui { position: absolute; inset: 0; pointer-events: none; }
+        .hud-overlay { position: absolute; padding: 20px; font-size: 10px; border: 1px solid rgba(0, 255, 255, 0.2); background: rgba(0, 20, 20, 0.5); }
+        .bottom-left { bottom: 20px; left: 20px; }
+        #start-btn { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 15px 30px; border: 2px solid #0ff; background: none; color: #0ff;
+            cursor: pointer; pointer-events: auto; font-family: inherit;
+        }
+        video { position: absolute; top: 20px; right: 20px; width: 100px; opacity: 0.3; transform: scaleX(-1); border-radius: 50%; border: 2px solid #0ff; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+    <div id="ui">
+        <div class="hud-overlay bottom-left">
+            PROJECT: MARK_NEXT_GEN<br>STATUS: ANALYZING_MESH...<br>CORE: ARC_V2
+        </div>
+        <button id="start-btn">ENGAGE CONSTRUCTION</button>
+    </div>
+    <video id="webcam" autoplay playsinline></video>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Configuration ---
+        const PARTICLE_COUNT = 5000;
+        let handX = 0, handY = 0, isHandActive = false;
+
+        // --- Three.js Setup ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- 3D Model Construction (The Wireframe) ---
+        const wireframeGeom = new THREE.IcosahedronGeometry(2, 2);
+        const wireframeMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.1 });
+        const modelMesh = new THREE.Mesh(wireframeGeom, wireframeMat);
+        scene.add(modelMesh);
+
+        // --- Holographic Particles ---
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLE_COUNT * 3);
+        const targetPos = new Float32Array(PARTICLE_COUNT * 3);
+        
+        // Use wireframe vertices as targets for the particles to "build" the model
+        const baseVertices = wireframeGeom.attributes.position.array;
+        for(let i=0; i<PARTICLE_COUNT; i++) {
+            const vIdx = (i % (baseVertices.length / 3)) * 3;
+            targetPos[i*3] = baseVertices[vIdx];
+            targetPos[i*3+1] = baseVertices[vIdx+1];
+            targetPos[i*3+2] = baseVertices[vIdx+2];
+            positions[i*3] = (Math.random()-0.5)*20;
+            positions[i*3+1] = (Math.random()-0.5)*20;
+            positions[i*3+2] = (Math.random()-0.5)*20;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({ size: 0.03, color: 0x00ffff, blending: THREE.AdditiveBlending });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        camera.position.z = 6;
+
+        // --- Hand Tracking ---
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0 });
+        hands.onResults(res => {
+            if (res.multiHandLandmarks?.length) {
+                isHandActive = true;
+                const tip = res.multiHandLandmarks[0][8];
+                handX = (tip.x - 0.5) * -12;
+                handY = (tip.y - 0.5) * -8;
+            } else { isHandActive = false; }
+        });
+
+        document.getElementById('start-btn').onclick = (e) => {
+            e.target.style.display = 'none';
+            new Camera(document.getElementById('webcam'), {
+                onFrame: async () => await hands.send({image: document.getElementById('webcam')}),
+                width: 480, height: 360
+            }).start();
+        };
+
+        // --- Animation Logic ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const pos = geometry.attributes.position.array;
+            
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const ix = i*3, iy = i*3+1, iz = i*3+2;
+                
+                // If hand is active, particles "swarm" the hand, then return to build the model
+                let tx = targetPos[ix];
+                let ty = targetPos[iy];
+                let tz = targetPos[iz];
+
+                if(isHandActive) {
+                    tx = handX + (targetPos[ix] * 0.5);
+                    ty = handY + (targetPos[iy] * 0.5);
+                }
+
+                pos[ix] += (tx - pos[ix]) * 0.05;
+                pos[iy] += (ty - pos[iy]) * 0.05;
+                pos[iz] += (tz - pos[iz]) * 0.05;
+            }
+
+            modelMesh.position.x = handX;
+            modelMesh.position.y = handY;
+            modelMesh.rotation.y += 0.01;
+            points.rotation.y += 0.01;
+            
+            geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
