@@ -1,0 +1,285 @@
+01.23 08:32
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMNI_CORE_PORTRAIT_CAM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:radial-gradient(circle at center,#001 0%,#000 100%);
+    color:#0ff;
+    font-family:'Share Tech Mono',monospace;
+}
+
+/* ===== UI ===== */
+#ui{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    padding:16px;
+}
+#ui::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,255,.03),
+        rgba(0,255,255,.03) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+}
+#hud{
+    border-left:2px solid #0ff;
+    padding-left:10px;
+    font-size:11px;
+    line-height:1.6;
+}
+#start{
+    pointer-events:auto;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    padding:18px 50px;
+    border:1px solid #0ff;
+    background:rgba(0,255,255,.08);
+    color:#0ff;
+    letter-spacing:5px;
+    cursor:pointer;
+}
+#start:hover{
+    background:rgba(0,255,255,.25);
+}
+
+/* ===== PORTRAIT RECTANGULAR WEBCAM ===== */
+video{
+    position:absolute;
+    bottom:14px;
+    right:14px;
+
+    width:96px;          /* narrow */
+    height:160px;        /* tall (portrait) */
+
+    object-fit:cover;
+
+    /* mirror only (NO rotation) */
+    transform:scaleX(-1);
+
+    border-radius:6px;
+    opacity:0.35;
+
+    border:1px solid #0ff;
+    box-shadow:0 0 14px rgba(0,255,255,0.45);
+}
+
+/* Desktop adjustment */
+@media (min-width:768px){
+    video{
+        width:120px;
+        height:180px;
+        opacity:0.25;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+
+<body>
+
+<div id="ui">
+    <div id="hud">CORE OFFLINE</div>
+    <button id="start">INITIALIZE CORE</button>
+</div>
+
+<video id="webcam" autoplay playsinline></video>
+
+<script type="module">
+import * as THREE from "three";
+
+/* ===== SCENE ===== */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 100);
+camera.position.z = 7;
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.4;
+document.body.appendChild(renderer.domElement);
+
+const clock = new THREE.Clock();
+
+/* ===== MATERIAL ===== */
+const holoMat = () => new THREE.MeshBasicMaterial({
+    color:0x00ffff,
+    wireframe:true,
+    transparent:true,
+    opacity:0.35,
+    blending:THREE.AdditiveBlending
+});
+
+/* ===== CORE GROUP ===== */
+const core = new THREE.Group();
+scene.add(core);
+
+/* Cube lattice */
+for(let i=0;i<3;i++){
+    const cube = new THREE.Mesh(
+        new THREE.BoxGeometry(2+i*.4,2+i*.4,2+i*.4,4,4,4),
+        holoMat()
+    );
+    cube.rotation.set(Math.random(),Math.random(),Math.random());
+    core.add(cube);
+}
+
+/* Sacred rings */
+const rings = new THREE.Group();
+for(let i=0;i<4;i++){
+    const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(3+i*.35, .05, 8, 128),
+        holoMat()
+    );
+    ring.rotation.x = Math.PI/2;
+    rings.add(ring);
+}
+core.add(rings);
+
+/* Particle field */
+const fieldCount = 900;
+const fieldGeo = new THREE.BufferGeometry();
+const fieldPos = new Float32Array(fieldCount*3);
+
+for(let i=0;i<fieldCount;i++){
+    const a = Math.random()*Math.PI*2;
+    const r = 1.5 + Math.random()*2.5;
+    fieldPos[i*3]   = Math.cos(a)*r;
+    fieldPos[i*3+1] = (Math.random()-.5)*2;
+    fieldPos[i*3+2] = Math.sin(a)*r;
+}
+fieldGeo.setAttribute("position", new THREE.BufferAttribute(fieldPos,3));
+
+const field = new THREE.Points(
+    fieldGeo,
+    new THREE.PointsMaterial({
+        color:0x00ffff,
+        size:0.03,
+        blending:THREE.AdditiveBlending
+    })
+);
+core.add(field);
+
+/* Energy nodes */
+const nodes = new THREE.Group();
+for(let i=0;i<12;i++){
+    const node = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.15,1),
+        new THREE.MeshBasicMaterial({
+            color:0x00ffff,
+            transparent:true,
+            opacity:0.6,
+            blending:THREE.AdditiveBlending
+        })
+    );
+    node.position.set(
+        (Math.random()-.5)*1.2,
+        (Math.random()-.5)*1.2,
+        (Math.random()-.5)*1.2
+    );
+    nodes.add(node);
+}
+core.add(nodes);
+
+/* Grid */
+const grid = new THREE.GridHelper(20,40,0x003333,0x001111);
+grid.position.y = -4;
+scene.add(grid);
+
+/* ===== HAND TRACKING ===== */
+let hx=0, hy=0, active=false;
+
+const hands = new Hands({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+});
+hands.setOptions({maxNumHands:1, modelComplexity:0});
+
+hands.onResults(res=>{
+    if(res.multiHandLandmarks?.length){
+        active=true;
+        const p = res.multiHandLandmarks[0][8];
+        hx = (p.x-.5)*-10;
+        hy = (p.y-.5)*-8;
+    } else active=false;
+});
+
+/* Start camera */
+start.onclick = ()=>{
+    start.style.display="none";
+    new Camera(webcam,{
+        onFrame: async()=>hands.send({image:webcam}),
+        width:480,height:640   /*  portrait camera feed */
+    }).start();
+};
+
+const hud = document.getElementById("hud");
+
+/* ===== LOOP ===== */
+function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    core.position.x += ((active?hx:0) - core.position.x)*0.06;
+    core.position.y += ((active?hy:0) - core.position.y)*0.06;
+
+    core.rotation.y = t*0.3;
+    core.rotation.x = Math.sin(t*0.2)*0.3;
+
+    rings.children.forEach((r,i)=>{
+        r.rotation.z = t*(0.2+i*0.15);
+    });
+
+    field.rotation.y = -t*0.4;
+
+    nodes.children.forEach((n,i)=>{
+        n.position.y = Math.sin(t+i)*0.6;
+    });
+
+    camera.position.x = Math.sin(t*0.2)*0.4;
+    camera.position.y = Math.cos(t*0.15)*0.3;
+    camera.lookAt(0,0,0);
+
+    hud.innerHTML = `
+CORE STATE: ${active?"SYNCED":"SEARCHING"}<br>
+LAYERS: 4<br>
+NODES: 12<br>
+FIELD: ${fieldCount}<br>
+TIME: ${t.toFixed(1)}
+`;
+
+    renderer.render(scene,camera);
+}
+animate();
+</script>
+
+</body>
+</html>
+
